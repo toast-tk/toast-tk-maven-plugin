@@ -54,7 +54,7 @@ public class DownloadScriptsMojo extends AbstractMojo {
     private String host;
     
     private static final String TAOST_OFFLINE_WEB_REPO_FILE = "toast_web_repository.txt";
-    private static final String TAOST_OFFLINE_SWING_REPO_FILE = "toast_web_repository.txt";
+    private static final String TAOST_OFFLINE_SWING_REPO_FILE = "toast_swing_repository.txt";
     private static final String SCENARIO_EXTENSION = ".md";
     private static final String SCENARIO_FOLDER = "scenarios";
 
