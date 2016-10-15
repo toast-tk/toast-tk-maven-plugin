@@ -67,16 +67,16 @@ public class DownloadScriptsMojo extends AbstractMojo {
 		getLog().info("Toast Tk Maven Plugin - Files will be generated in package " + outputPackage);
 		getLog().info("Toast Tk Maven Plugin - Connecting to -> " + host);
 		try {
-			String repository = RestUtils.downloadRepository(host + "/loadWikifiedRepository/" + apiKey);
+			String repository = RestUtils.downloadRepository(host + "/repository/swing/" + apiKey);
 			File scenarioImplFile = new File(outputResourceDirectory, TAOST_OFFLINE_SWING_REPO_FILE);
 			writeFile(scenarioImplFile, repository);
 
-			String webrepository = RestUtils.downloadRepository(host + "/loadWebWikifiedRepository/" + apiKey);
+			String webrepository = RestUtils.downloadRepository(host + "/repository/web/" + apiKey);
 			File destFile = new File(outputResourceDirectory, TAOST_OFFLINE_WEB_REPO_FILE);
 			writeFile(destFile, webrepository);
 
 			Client httpClient = Client.create();
-			Set<Driver> drivers = downloadScenarii(host + "/wikiScenarii/" + apiKey, httpClient);
+			Set<Driver> drivers = downloadScenarii(host + "/scenario/wiki/" + apiKey, httpClient);
 			StringBuilder builder = new StringBuilder();
 			try {
 				// common driver file
