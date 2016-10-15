@@ -117,7 +117,7 @@ public class DeployConnectorMojo extends AbstractMojo {
         ActionAdapterDescriptor descriptor = new ActionAdapterDescriptor(project.getName(),
                 sentences);
         String json = gson.toJson(descriptor);
-        RestUtils.post(host + "/postConnector", json);
+        RestUtils.post(host + "/actionadapter", json, apiKey);
     }
 
 }
