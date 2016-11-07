@@ -7,9 +7,11 @@
 	<version>0.1.4-SNAPSHOT</version>
 	<artifactId>toast-tk-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<name>Toast Toolkit - Maven Mojo Plugin</name>
-	<url>http://maven.apache.org</url>
-	
+	<name>Toast Toolkit - Maven Plugin</name>
+	<url>http://toast-tk.ui</url>
+	<description>
+		Toast TK Maven plugin: Synchronise scenarios with toast webapp
+	</description>
 	<properties>
 		<javassit.version>3.18.1-GA</javassit.version>
 		<reflexion.version>0.9.9-RC1</reflexion.version>
@@ -19,7 +21,6 @@
 		<maven-plugin-plugin.version>3.4</maven-plugin-plugin.version>
 		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
 		<maven-plugin-annotations.version>3.4</maven-plugin-annotations.version>
-		<toast-tk.engine.version>0.1.4-SNAPSHOT</toast-tk.engine.version>
 		<maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
 		<maven-javadoc-plugin.version>2.3</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>2.0.4</maven-source-plugin.version>
@@ -141,12 +142,12 @@
 		<dependency>
 			<groupId>io.toast-tk</groupId>
 			<artifactId>toast-tk-adapters-api</artifactId>
-			<version>${toast-tk.engine.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.toast-tk</groupId>
 			<artifactId>toast-tk-rest-utils</artifactId>
-			<version>${toast-tk.engine.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<profiles>
