@@ -30,7 +30,7 @@ How to use the Toast Tk Maven Plugin can be found on the [example project(https:
 <plugin>
 	<groupId>io.toast-tk</groupId>
 	<artifactId>toast-tk-maven-plugin</artifactId>
-	<version>0.1.4-SNAPSHOT</version>
+	<version>0.1.5-SNAPSHOT</version>
 	<executions>
 		<execution>
 			<phase>generate-sources</phase>
