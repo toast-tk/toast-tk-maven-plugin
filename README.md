@@ -2,7 +2,7 @@
 
 A Maven plugin to downloads scenario and upload reusable sentences to  [toast-tk-webapp](https://github.com/toast-tk/toast-tk-webapp).   
 It helps collecting scenarios for local execution.  
-How to use the Toast Tk Maven Plugin can be found on the [example project](https://github.com/toast-tk/toast-tk-example).  
+How to use the Toast Tk Maven Plugin can be found on the [example project](https://github.com/toast-tk/toast-tk-examples).  
 
 ## Goals overview 
 * generates-sources:download to download scenarios related to the user token.
