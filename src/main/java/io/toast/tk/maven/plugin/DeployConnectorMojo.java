@@ -45,6 +45,7 @@ public class DeployConnectorMojo extends AbstractMojo {
     @Parameter(required = true, defaultValue = "${project}", readonly = true)
     MavenProject project;
 
+    @Override
     public void execute()
             throws MojoExecutionException {
         getLog().info("Toast Tk Maven Plugin - Files will be posted to: " + host);
@@ -61,7 +62,7 @@ public class DeployConnectorMojo extends AbstractMojo {
         ClassPool cp = initClassPath();
         File file = new File(project.getBuild().getOutputDirectory());
         Iterator<File> iterateFiles = FileUtils.iterateFiles(file, new String[]{"class"}, true);
-        for (; iterateFiles.hasNext(); ) {
+        while (iterateFiles.hasNext()) {
             try {
                 processClassAndPostConnector(cp, iterateFiles.next());
             } catch (Exception e) {

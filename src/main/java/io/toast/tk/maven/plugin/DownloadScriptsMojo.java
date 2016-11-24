@@ -55,6 +55,7 @@ public class DownloadScriptsMojo extends AbstractMojo {
 	private static final String SCENARIO_EXTENSION = ".md";
 	private static final String SCENARIO_FOLDER = "scenarios";
 
+    @Override
 	public void execute() throws MojoExecutionException {
 		if (outputResourceDirectory != null && !outputResourceDirectory.exists()) {
 			outputResourceDirectory.mkdir();
@@ -74,17 +75,13 @@ public class DownloadScriptsMojo extends AbstractMojo {
 
 			downloadScenarii(host + "/scenario/wiki/" + apiKey);
 			StringBuilder builder = new StringBuilder();
-			try {
-				File driverJson = new File(outputResourceDirectory, adaptersFileName);
-				Gson gson = new GsonBuilder().setPrettyPrinting().create();
-				JsonParser jp = new JsonParser();
-				String v = builder.toString().replace(",]}", "]}");
-				JsonElement je = jp.parse(v);
-				String prettyJsonString = gson.toJson(je);
-				writeFile(driverJson, prettyJsonString);
-			} catch (MojoExecutionException e) {
-				getLog().error(e);
-			}
+			File driverJson = new File(outputResourceDirectory, adaptersFileName);
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			JsonParser jp = new JsonParser();
+			String v = builder.toString().replace(",]}", "]}");
+			JsonElement je = jp.parse(v);
+			String prettyJsonString = gson.toJson(je);
+			writeFile(driverJson, prettyJsonString);
 			getLog().info("Toast Tk Maven Plugin - Update completed !");
 		} catch (Exception e) {
 			getLog().error("Toast Tk Maven Plugin - Update cancelled !");
