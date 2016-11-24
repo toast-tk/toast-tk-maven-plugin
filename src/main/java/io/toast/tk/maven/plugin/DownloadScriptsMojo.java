@@ -108,11 +108,8 @@ public class DownloadScriptsMojo extends AbstractMojo {
 				String scenarioHeader = "#include " + File.separator + SCENARIO_FOLDER
 										+ File.separator + TAOST_OFFLINE_WEB_REPO_FILE+ "\n\n";
 				String scenario = scenarioHeader + jsonResult.getString(i);
-				Pattern pattern1 = Pattern.compile("(scenario driver):(\\w*)");
-				Pattern pattern2 = Pattern.compile("(\\|\\| scenario \\|\\| )(\\w*)( \\|\\|)");
 				Pattern pattern3 = Pattern.compile("(Name):(\\w*)");
-				Matcher matcher = pattern1.matcher(scenario);
-				matcher = pattern3.matcher(scenario);
+				Matcher matcher = pattern3.matcher(scenario);
 				String scenarioName = "";
 				while (matcher.find()) {
 					scenarioName = matcher.group(2);
