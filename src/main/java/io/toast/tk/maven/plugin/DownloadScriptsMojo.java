@@ -4,14 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -38,8 +35,8 @@ public class DownloadScriptsMojo extends AbstractMojo {
 	@Parameter(defaultValue = "${project.build.directory}", required = true)
 	private String buildDir;
 
-	@Parameter(required = false, defaultValue = "toast_settings.json")
-	private String settingFileName;
+	@Parameter(required = false, defaultValue = "toast_adapters.json")
+	private String adaptersFileName;
 
 	@Parameter(required = true, alias = "apiKey")
 	private String apiKey;
@@ -53,8 +50,8 @@ public class DownloadScriptsMojo extends AbstractMojo {
 	@Parameter(required = true, alias = "webAppUrl", defaultValue = "9000")
 	private String host;
 
-	private static final String TAOST_OFFLINE_WEB_REPO_FILE = "toast_web_repository.txt";
-	private static final String TAOST_OFFLINE_SWING_REPO_FILE = "toast_swing_repository.txt";
+	private static final String TAOST_OFFLINE_WEB_REPO_FILE = "toast_web_repository.md";
+	private static final String TAOST_OFFLINE_SWING_REPO_FILE = "toast_swing_repository.md";
 	private static final String SCENARIO_EXTENSION = ".md";
 	private static final String SCENARIO_FOLDER = "scenarios";
 
@@ -75,12 +72,10 @@ public class DownloadScriptsMojo extends AbstractMojo {
 			File destFile = new File(outputResourceDirectory, TAOST_OFFLINE_WEB_REPO_FILE);
 			writeFile(destFile, webrepository);
 
-			Client httpClient = Client.create();
-			Set<Driver> drivers = downloadScenarii(host + "/scenario/wiki/" + apiKey, httpClient);
+			downloadScenarii(host + "/scenario/wiki/" + apiKey);
 			StringBuilder builder = new StringBuilder();
 			try {
-				// common driver file
-				File driverJson = new File(outputResourceDirectory, settingFileName);
+				File driverJson = new File(outputResourceDirectory, adaptersFileName);
 				Gson gson = new GsonBuilder().setPrettyPrinting().create();
 				JsonParser jp = new JsonParser();
 				String v = builder.toString().replace(",]}", "]}");
@@ -88,7 +83,7 @@ public class DownloadScriptsMojo extends AbstractMojo {
 				String prettyJsonString = gson.toJson(je);
 				writeFile(driverJson, prettyJsonString);
 			} catch (MojoExecutionException e) {
-				e.printStackTrace();
+				getLog().error(e);
 			}
 			getLog().info("Toast Tk Maven Plugin - Update completed !");
 		} catch (Exception e) {
@@ -97,12 +92,13 @@ public class DownloadScriptsMojo extends AbstractMojo {
 		}
 	}
 
-	private Set<Driver> downloadScenarii(String uri, Client httpClient) throws MojoExecutionException {
+	private void downloadScenarii(String uri) throws MojoExecutionException {
+		Client httpClient = Client.create();
 		String jsonResponse = RestUtils.getJsonResponseAsString(uri, httpClient);
-		Set<Driver> drivers = new HashSet<DownloadScriptsMojo.Driver>();
 		JSONArray jsonResult;
 		File scenariiOutputFolder = new File(
-				outputResourceDirectory.getAbsolutePath() + File.separator + SCENARIO_FOLDER);
+				outputResourceDirectory.getAbsolutePath() 
+				+ File.separator + SCENARIO_FOLDER);
 		scenariiOutputFolder.mkdir();
 		try {
 			jsonResult = new JSONArray(jsonResponse);
@@ -116,25 +112,6 @@ public class DownloadScriptsMojo extends AbstractMojo {
 				Pattern pattern2 = Pattern.compile("(\\|\\| scenario \\|\\| )(\\w*)( \\|\\|)");
 				Pattern pattern3 = Pattern.compile("(Name):(\\w*)");
 				Matcher matcher = pattern1.matcher(scenario);
-				String driverName = "";
-				while (matcher.find()) {
-					driverName = matcher.group(2);
-				}
-				String driverType = "";
-				matcher = pattern2.matcher(scenario);
-				while (matcher.find()) {
-					driverType = matcher.group(2);
-				}
-				Driver e = new Driver(driverType, driverName);
-				boolean addDriver = true;
-				for (Driver d : drivers) {
-					if (d.name.equals(e.name) && d.type.equals(e.type)) {
-						addDriver = false;
-					}
-				}
-				if (addDriver) {
-					drivers.add(e);
-				}
 				matcher = pattern3.matcher(scenario);
 				String scenarioName = "";
 				while (matcher.find()) {
@@ -145,54 +122,14 @@ public class DownloadScriptsMojo extends AbstractMojo {
 				writeFile(scenarioFile, scenario);
 			}
 		} catch (JSONException e) {
-			e.printStackTrace();
+			getLog().error(e);
 		}
-		return drivers;
-	}
-
-	class Settings {
-		public List<Driver> settings;
-	}
-
-	class Driver {
-
-		public String name;
-
-		public String type;
-
-		public String className;
-
-		public List<Sentence> sentences;
-
-		Driver(String type, String name) {
-			this.name = name;
-			this.type = type;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof Driver) {
-				Driver d = (Driver) obj;
-				return d.name.equals(this.name) && d.type.equals(this.type);
-			}
-			return super.equals(obj);
-		}
-
-		@Override
-		public int hashCode() {
-			return new HashCodeBuilder(17, 31).append(name).append(type).toHashCode();
-		}
-	}
-
-	class Sentence {
-		public String pattern;
-		public String text;
 	}
 
 	private void writeFile(File file, String content) throws MojoExecutionException {
 		BufferedWriter out = null;
-		try {
-			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+		try(OutputStream stream = new FileOutputStream(file)) {
+			out = new BufferedWriter(new OutputStreamWriter(stream, "UTF-8"));
 			out.write(content);
 		} catch (IOException e) {
 			getLog().error(e);
