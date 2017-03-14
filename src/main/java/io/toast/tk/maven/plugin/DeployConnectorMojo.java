@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import io.toast.tk.core.rest.HttpRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -116,8 +117,12 @@ public class DeployConnectorMojo extends AbstractMojo {
     private void postConnector(final List<ActionAdapterDescriptorLine> sentences) {
         Gson gson = new Gson();
         ActionAdapterDescriptor descriptor = new ActionAdapterDescriptor(project.getName(), sentences);
+        String postUri = host + "/actionadapter";
         String json = gson.toJson(descriptor);
-        RestUtils.post(host + "/actionadapter", json, apiKey);
+        HttpRequest request = HttpRequest.Builder.create()
+                                            .uri(postUri).json(json)
+                                            .withKey(apiKey).build();
+        RestUtils.post(request);
     }
 
 }
