@@ -38,6 +38,7 @@ import java.net.URLClassLoader;
 import java.util.*;
 
 
+
 @Mojo(name = "run",
         defaultPhase = LifecyclePhase.VERIFY,
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
@@ -61,23 +62,15 @@ public class RunScriptsMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            File file = new File(this.outputDirectory);
-
-            if(!file.exists()){
-                file.mkdir();
-            } else if(!file.isDirectory()){
-                throw new IOException(this.outputDirectory + "isn't a valid directory !");
-            }
-
-            PluginLoader loader = new PluginLoader(this.pluginDir);
-            this.pluginModules = pluginDir == null ? new Module[]{} : loader.collectGuiceModules(loader.loadPlugins(IAgentPlugin.class.getClassLoader()));
-            addURL(new File(project.getBuild().getOutputDirectory()).toURI().toURL());
-
             try {
                 extendPluginClassPath();
             } catch (DependencyResolutionRequiredException e) {
                 getLog().error(e);
             }
+
+            initReportOutputDir();
+
+            initPluginModules();
 
             for (int i =0; i < scripts.length; i++){
                 List<File> files = toFileList(scripts[i]);
@@ -89,6 +82,19 @@ public class RunScriptsMojo extends AbstractMojo {
         }
     }
 
+    private void initPluginModules() {
+        PluginLoader loader = new PluginLoader(this.pluginDir);
+        this.pluginModules = pluginDir == null ? new Module[]{} : loader.collectGuiceModules(loader.loadPlugins(IAgentPlugin.class.getClassLoader()));
+    }
+
+    private void initReportOutputDir() throws IOException {
+        File file = new File(this.outputDirectory);
+        if(!file.exists()){
+            file.mkdir();
+        } else if(!file.isDirectory()){
+            throw new IOException(this.outputDirectory + "isn't a valid directory !");
+        }
+    }
 
     public static List<File> toFileList(FileSet scriptSet) throws IOException {
         File directory = new File(scriptSet.getDirectory());
@@ -138,12 +144,11 @@ public class RunScriptsMojo extends AbstractMojo {
         return testPageRunner.runTestPage(testPage);
     }
 
-    private static final Class[] parameters = new Class[]{URL.class};
     public static void addURL(URL u) throws IOException {
-        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        URLClassLoader sysloader = (URLClassLoader) ToastCache.class.getClassLoader();
         Class sysclass = URLClassLoader.class;
         try {
-            Method method = sysclass.getDeclaredMethod("addURL", parameters);
+            Method method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
             method.setAccessible(true);
             method.invoke(sysloader, new Object[]{u});
         } catch (Throwable t) {
@@ -152,17 +157,17 @@ public class RunScriptsMojo extends AbstractMojo {
         }
     }
 
-
     private void extendPluginClassPath()
             throws IOException,
             DependencyResolutionRequiredException {
         List<String> elements = project.getRuntimeClasspathElements();
-        getLog().info("Extending plugin classpath... " );
+        getLog().info("Extending plugin classpath with project runtime dependencies... " );
         for (String element : elements) {
             addURL(new File(element).toURI().toURL());
             getLog().info("- " + new File(element).toURI().toURL());
         }
 
+        getLog().info("Adding adapters from project classpath... ");
         ClassPool cp= ClassPool.getDefault();
         File directory = new File(project.getBuild().getOutputDirectory());
         Iterator<File> iterateFiles = org.apache.commons.io.FileUtils.iterateFiles(directory, new String[]{"class"}, true);
@@ -171,7 +176,6 @@ public class RunScriptsMojo extends AbstractMojo {
                 DataInputStream dataInputStream = new DataInputStream(new FileInputStream(iterateFiles.next()));
                 ClassFile classFile = new ClassFile(dataInputStream);
                 CtClass c = cp.get(classFile.getName());
-                getLog().info("Adding adapters from project classpath... " + c.getName());
                 if (c.hasAnnotation(ActionAdapter.class) && !Modifier.isAbstract(c.getModifiers())) {
                     getLog().info("- " + c.getName());
                     ToastCache.getInstance().addActionAdapter(c.toClass());
