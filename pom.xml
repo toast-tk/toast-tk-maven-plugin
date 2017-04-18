@@ -10,7 +10,10 @@
 	<name>Toast Toolkit - Maven Plugin</name>
 	<url>http://toast-tk.io</url>
 	<description>
-		Toast TK Maven plugin: Synchronise scenarios with toast webapp
+		Toast TK Maven plugin Mojos:
+		- download: Download test scripts locally
+		- upload: Upload local @Action sentences to be used on the webapp (steps' auto-completion)
+		- run: Execute local test scripts
 	</description>
 	<properties>
 		<javassit.version>3.18.1-GA</javassit.version>
@@ -28,6 +31,8 @@
 		<maven-release-plugin.version>2.4</maven-release-plugin.version>
 		<maven-artifact.version>2.2.1</maven-artifact.version>
 		<file-management.version>3.0.0</file-management.version>
+		<java.version>1.8</java.version>
+		<java.charset.encoding>UTF-8</java.charset.encoding>
 	</properties>
 
 	<build>
@@ -37,9 +42,9 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<encoding>UTF-8</encoding>
-					<source>1.8</source>
-					<target>1.8</target>
+					<encoding>${java.charset.encoding}</encoding>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 					<fork>true</fork>
 					<verbose>true</verbose>
 				</configuration>
