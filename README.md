@@ -5,8 +5,9 @@ It helps collecting scenarios for local execution.
 How to use the Toast Tk Maven Plugin can be found on the [example project](https://github.com/toast-tk/toast-tk-examples).  
 
 ## Goals overview 
-* generates-sources:download to download scenarios related to the user token.
-* install:upload to push the sentences you want to re-use on the webapp.
+* __generates-sources:download__ to download scenarios related to the user token.
+* __install:upload__ to push the sentences you want to re-use on the webapp.
+* __verify:run__ to execute a set of scripts and displays the execution report.
 
 ## POM configuration example
 
@@ -24,7 +25,7 @@ How to use the Toast Tk Maven Plugin can be found on the [example project](https
 </repository>
 ```
 
-* Plugin configuration
+* Download Mojo - configuration example
 
 ```
 <plugin>
@@ -48,6 +49,35 @@ How to use the Toast Tk Maven Plugin can be found on the [example project](https
 </plugin>
 ```
 
+
+* Run Mojo - configuration example
+```
+<plugin>
+	<groupId>io.toast-tk</groupId>
+	<artifactId>toast-tk-maven-plugin</artifactId>
+	<version>${toast.snapshot.version}</version>
+	<executions>
+		<execution>
+			<phase>verify</phase>
+			<goals>
+				<goal>run</goal>
+			</goals>
+			<configuration>
+				<scripts>
+					<fileset>
+						<directory>${basedir}/src/main/resources</directory>
+						<includes>
+							<include>/**/*.*.md</include>
+						</includes>
+					</fileset>
+				</scripts>
+				<pluginsDirectory>${basedir}/plugins</pluginsDirectory>
+				<outputDirectory>${basedir}/reports</outputDirectory>
+			</configuration>
+		</execution>
+	</executions>
+</plugin>
+```
 # Contribution
 
 Toast TK is a young ![Open Source Love](https://badges.frapsoft.com/os/v3/open-source.svg?v=103) project.  
