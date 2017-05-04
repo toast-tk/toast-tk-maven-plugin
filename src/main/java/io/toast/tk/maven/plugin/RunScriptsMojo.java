@@ -48,17 +48,13 @@ public class RunScriptsMojo extends AbstractMojo {
     @Parameter(required = true, defaultValue = "${project}", readonly = true)
     private MavenProject project;
 
-    private TestPageRunner testPageRunner;
     private Module[] pluginModules;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            try {
-                extendPluginClassPath();
-            } catch (DependencyResolutionRequiredException e) {
-                throw new MojoExecutionException(e.getMessage(), e);
-            }
+
+            extendPluginClassPath();
 
             initReportOutputDir();
 
@@ -69,7 +65,7 @@ public class RunScriptsMojo extends AbstractMojo {
                 final List<ITestPage> testScripts = getScripts(files);
                 executeScripts(testScripts);
             }
-        } catch (IOException e) {
+        } catch (IOException | DependencyResolutionRequiredException e) {
             getLog().error(e);
         }
     }
@@ -111,7 +107,7 @@ public class RunScriptsMojo extends AbstractMojo {
         files.forEach(p -> {
             try{
                 List<String> scriptLines = FileHelper.getScript(new FileInputStream(p));
-                ITestPage testScript = parser.parse(scriptLines, p.getName().toString());
+                ITestPage testScript = parser.parse(scriptLines, p.getName());
                 testScripts.add(testScript);
             }catch(Exception e){
                 getLog().error("Unable to parse " + p.getName() + " !", e);
@@ -132,7 +128,7 @@ public class RunScriptsMojo extends AbstractMojo {
 
     protected ITestPage run(ITestPage testPage) throws IOException {
         getLog().info("Agent plugin class loader: " + IAgentPlugin.class.getClassLoader());
-        this.testPageRunner = new TestPageRunner(this.outputDirectory, this.pluginModules);
+        TestPageRunner testPageRunner = new TestPageRunner(this.outputDirectory, this.pluginModules);
         return testPageRunner.runTestPage(testPage);
     }
 
@@ -143,9 +139,8 @@ public class RunScriptsMojo extends AbstractMojo {
             Method method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
             method.setAccessible(true);
             method.invoke(sysloader, new Object[]{u});
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new IOException("Error, could not add URL to system classloader");
+        } catch (Exception e) {
+            throw new IOException("Error, could not add URL to system classloader", e);
         }
     }
 
