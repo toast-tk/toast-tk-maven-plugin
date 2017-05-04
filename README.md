@@ -9,7 +9,7 @@ How to use the Toast Tk Maven Plugin can be found on the [example project](https
 * __install:upload__ to push the sentences you want to re-use on the webapp.
 * __verify:run__ to execute a set of scripts and displays the execution report.
 
-## POM configuration example
+## Examples
 
 * Include maven snapshot repository
 ```
@@ -25,7 +25,7 @@ How to use the Toast Tk Maven Plugin can be found on the [example project](https
 </repository>
 ```
 
-* Download Mojo - configuration example
+* Download Mojo - example
 
 ```
 <plugin>
@@ -50,12 +50,12 @@ How to use the Toast Tk Maven Plugin can be found on the [example project](https
 ```
 
 
-* Run Mojo - configuration example
+* Run Mojo - example
 ```
 <plugin>
 	<groupId>io.toast-tk</groupId>
 	<artifactId>toast-tk-maven-plugin</artifactId>
-	<version>${toast.snapshot.version}</version>
+	<version>0.1.5-SNAPSHOT</version>
 	<executions>
 		<execution>
 			<phase>verify</phase>
