@@ -65,12 +65,12 @@ public class RunScriptsMojo extends AbstractMojo {
                 final List<ITestPage> testScripts = getScripts(files);
                 executeScripts(testScripts);
             }
-        } catch (IOException | DependencyResolutionRequiredException e) {
+        } catch (IOException | IllegalAccessException | DependencyResolutionRequiredException e) {
             getLog().error(e);
         }
     }
 
-    private void initPluginModules() {
+    private void initPluginModules() throws IllegalAccessException {
         PluginLoader loader = new PluginLoader(this.pluginDir);
         this.pluginModules = pluginDir == null ? new Module[]{} : loader.collectGuiceModules(loader.loadPlugins(IAgentPlugin.class.getClassLoader()));
     }

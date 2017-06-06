@@ -20,7 +20,6 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 import com.google.gson.Gson;
-
 import io.toast.tk.core.annotation.Action;
 import io.toast.tk.core.annotation.ActionAdapter;
 import io.toast.tk.core.rest.RestUtils;
