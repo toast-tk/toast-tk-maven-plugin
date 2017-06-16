@@ -14,15 +14,12 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-
+import io.toast.tk.runtime.parse.TestPlanParser;
 import io.toast.tk.dao.domain.impl.test.block.ITestPlan;
 import io.toast.tk.maven.plugin.run.TestPlanRunner;
 import io.toast.tk.plugin.IAgentPlugin;
 import io.toast.tk.runtime.ToastRuntimeException;
 import io.toast.tk.runtime.parse.FileHelper;
-import io.toast.tk.runtime.parse.TestPlanParser;
-
-
 
 @Mojo(name = "report",
         defaultPhase = LifecyclePhase.VERIFY,
@@ -39,9 +36,6 @@ public class RunTestPlanMojo extends AbstractScriptExecutionMojo<ITestPlan> {
     @Parameter(required = false, alias = "scripts")
     private FileSet[] scripts;
 
-    @Parameter(defaultValue = "${basedir}")
-    private File baseDir;
-    
     @Parameter(required = true, alias = "apiKey")
     private String apiKey;
     
