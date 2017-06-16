@@ -14,6 +14,7 @@
 		- download: Download test scripts locally
 		- upload: Upload local @Action sentences to be used on the webapp (steps' auto-completion)
 		- run: Execute local test scripts
+		- report: publish test plan reports
 	</description>
 	<properties>
 		<javassit.version>3.18.1-GA</javassit.version>
