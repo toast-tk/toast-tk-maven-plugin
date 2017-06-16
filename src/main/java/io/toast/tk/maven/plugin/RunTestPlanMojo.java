@@ -15,18 +15,20 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
-import io.toast.tk.dao.domain.impl.test.block.ITestPage;
-import io.toast.tk.maven.plugin.run.TestPageRunner;
+import io.toast.tk.dao.domain.impl.test.block.ITestPlan;
+import io.toast.tk.maven.plugin.run.TestPlanRunner;
 import io.toast.tk.plugin.IAgentPlugin;
+import io.toast.tk.runtime.ToastRuntimeException;
 import io.toast.tk.runtime.parse.FileHelper;
-import io.toast.tk.runtime.parse.TestParser;
+import io.toast.tk.runtime.parse.TestPlanParser;
 
 
 
-@Mojo(name = "run",
+@Mojo(name = "report",
         defaultPhase = LifecyclePhase.VERIFY,
-        requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
-public class RunScriptsMojo extends AbstractScriptExecutionMojo<ITestPage> {
+        requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
+        requiresOnline = true)
+public class RunTestPlanMojo extends AbstractScriptExecutionMojo<ITestPlan> {
 
     @Parameter(required = false, alias = "pluginsDirectory")
     private String pluginDir;
@@ -37,6 +39,24 @@ public class RunScriptsMojo extends AbstractScriptExecutionMojo<ITestPage> {
     @Parameter(required = false, alias = "scripts")
     private FileSet[] scripts;
 
+    @Parameter(defaultValue = "${basedir}")
+    private File baseDir;
+    
+    @Parameter(required = true, alias = "apiKey")
+    private String apiKey;
+    
+    @Parameter(required = true, alias = "mongoHost")
+    private String mongoHost;
+    
+    @Parameter(required = true, alias = "mongoPort")
+    private Integer mongoPort;
+    
+    @Parameter(required = false, alias = "useRemoteRepository", defaultValue = "false")
+    private Boolean useRemoteRepository;
+    
+    @Parameter(required = true, alias = "mongoDb")
+    private String mongoDb;
+    
     @Parameter(required = true, defaultValue = "${project}", readonly = true)
     private MavenProject project;
 
@@ -47,8 +67,8 @@ public class RunScriptsMojo extends AbstractScriptExecutionMojo<ITestPage> {
         	
             for (int i =0; i < scripts.length; i++){
                 List<File> files = toFileList(scripts[i]);
-                final List<ITestPage> testScripts = getScripts(files);
-                execute(testScripts);
+                final List<ITestPlan> plans = getScripts(files);
+                execute(plans);
             }
         } catch (IOException e) {
             getLog().error(e);
@@ -56,35 +76,39 @@ public class RunScriptsMojo extends AbstractScriptExecutionMojo<ITestPage> {
     }
 
     @Override
-    protected List<ITestPage> getScripts(List<File> files) {
-        List<ITestPage> testScripts = new ArrayList<>();
-        TestParser parser = new TestParser();
+    protected List<ITestPlan> getScripts(List<File> files) {
+        List<ITestPlan> plans = new ArrayList<>();
+        TestPlanParser parser = new TestPlanParser();
         files.forEach(p -> {
             try{
-                List<String> scriptLines = FileHelper.getScript(new FileInputStream(p));
-                ITestPage testScript = parser.parse(scriptLines, p.getName());
-                testScripts.add(testScript);
+                List<String> lines = FileHelper.getScript(new FileInputStream(p));
+                ITestPlan plan = parser.parse(lines, p.getName());
+                plans.add(plan);
             }catch(Exception e){
                 getLog().error("Unable to parse " + p.getName() + " !", e);
             }
         });
-        return testScripts;
+        return plans;
     }
 
-    private void execute(List<ITestPage> testScripts) {
-        testScripts.forEach(script -> {
+    private void execute(List<ITestPlan> plans) {
+    	plans.forEach(plan -> {
             try {
-                run(script);
+                run(plan);
             } catch (Exception e) {
-                getLog().error("Failed to execute " + script.getName() + " !", e);
+                getLog().error("Failed to execute " + plan.getName() + " !", e);
             }
         });
     }
 
-    protected ITestPage run(ITestPage testPage) throws IOException {
+    protected void run(ITestPlan plan) throws IOException, ToastRuntimeException {
         getLog().info("Agent plugin class loader: " + IAgentPlugin.class.getClassLoader());
-        TestPageRunner testPageRunner = new TestPageRunner(this.outputDirectory, this.pluginModules);
-        return testPageRunner.runTestPage(testPage);
+        TestPlanRunner runner = new TestPlanRunner(this.outputDirectory, 
+        		this.mongoHost,
+        		this.mongoPort,
+        		this.mongoDb,
+        		this.pluginModules);
+        runner.testAndStore(apiKey, plan, useRemoteRepository.booleanValue());
     }
 
 	@Override
@@ -103,6 +127,4 @@ public class RunScriptsMojo extends AbstractScriptExecutionMojo<ITestPage> {
 	protected String getOutputDirectory() {
 		return this.outputDirectory;
 	}
-
-    
 }

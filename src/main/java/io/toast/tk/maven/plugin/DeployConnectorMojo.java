@@ -33,7 +33,11 @@ import javassist.Modifier;
 import javassist.NotFoundException;
 import javassist.bytecode.ClassFile;
 
-@Mojo(name = "upload", defaultPhase = LifecyclePhase.INSTALL, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(name = "upload", 
+defaultPhase = LifecyclePhase.INSTALL, 
+requiresDependencyResolution = ResolutionScope.COMPILE,
+requiresOnline = true,
+threadSafe = true)
 public class DeployConnectorMojo extends AbstractMojo {
 
     @Parameter(required = true, alias = "webAppUrl", defaultValue = "9000")
@@ -116,7 +120,7 @@ public class DeployConnectorMojo extends AbstractMojo {
     private void postConnector(final List<ActionAdapterDescriptorLine> sentences) {
         Gson gson = new Gson();
         ActionAdapterDescriptor descriptor = new ActionAdapterDescriptor(project.getName(), sentences);
-        String postUri = host + "/actionadapter";
+        String postUri = host + "/api/actionadapter";
         String json = gson.toJson(descriptor);
         HttpRequest request = HttpRequest.Builder.create()
                                             .uri(postUri).json(json)

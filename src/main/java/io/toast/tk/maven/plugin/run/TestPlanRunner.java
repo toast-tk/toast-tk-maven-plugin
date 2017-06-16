@@ -7,8 +7,12 @@ public class TestPlanRunner extends AbstractTestPlanRunner {
 
 	private String reportPath;
 
-	public TestPlanRunner(String reportPath, Module[] pluginModules) {
-		super(pluginModules);
+	public TestPlanRunner(final String reportPath, 
+			final String host, 
+			final int port, 
+			final String db,
+			final Module... pluginModules) {
+		super(host, port, db, pluginModules);
 		this.reportPath = reportPath;
 	}
 

@@ -26,10 +26,14 @@ import com.sun.jersey.api.client.Client;
 
 import io.toast.tk.core.rest.RestUtils;
 
-@Mojo(name = "download", defaultPhase = LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(name = "download",
+defaultPhase = LifecyclePhase.GENERATE_SOURCES, 
+requiresDependencyResolution = ResolutionScope.COMPILE,
+requiresOnline = true,
+threadSafe = true)
 public class DownloadScriptsMojo extends AbstractMojo {
 
-	@Parameter(defaultValue = "${basedir}/src/main/resources/settings", required = true)
+	@Parameter(defaultValue = "${basedir}/src/main/resources/webapp-output", required = true)
 	private File outputResourceDirectory;
 
 	@Parameter(defaultValue = "${project.build.directory}", required = true)
@@ -65,15 +69,15 @@ public class DownloadScriptsMojo extends AbstractMojo {
 		getLog().info("Toast Tk Maven Plugin - Files will be generated in package " + outputPackage);
 		getLog().info("Toast Tk Maven Plugin - Connecting to -> " + host);
 		try {
-			String repository = RestUtils.downloadRepository(host + "/repository/swing/" + apiKey);
+			String repository = RestUtils.downloadRepository(host + "/api/repository/swing/" + apiKey);
 			File scenarioImplFile = new File(outputResourceDirectory, TAOST_OFFLINE_SWING_REPO_FILE);
 			writeFile(scenarioImplFile, repository);
 
-			String webrepository = RestUtils.downloadRepository(host + "/repository/web/" + apiKey);
+			String webrepository = RestUtils.downloadRepository(host + "/api/repository/web/" + apiKey);
 			File destFile = new File(outputResourceDirectory, TAOST_OFFLINE_WEB_REPO_FILE);
 			writeFile(destFile, webrepository);
 
-			downloadScenarii(host + "/scenario/wiki/" + apiKey);
+			downloadScenarii(host + "/api/scenario/wiki/" + apiKey);
 			StringBuilder builder = new StringBuilder();
 			File driverJson = new File(outputResourceDirectory, adaptersFileName);
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -102,7 +106,8 @@ public class DownloadScriptsMojo extends AbstractMojo {
 			getLog().info("Copying " + jsonResult.length() + " scenarios");
 			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i < jsonResult.length(); i++) {
-				String scenarioHeader = "#include " + File.separator + SCENARIO_FOLDER
+				String scenarioHeader = "#include " 
+										+ File.separator + SCENARIO_FOLDER
 										+ File.separator + TAOST_OFFLINE_WEB_REPO_FILE+ "\n\n";
 				String scenario = scenarioHeader + jsonResult.getString(i);
 				Pattern pattern3 = Pattern.compile("(Name):(\\w*)");
@@ -125,18 +130,11 @@ public class DownloadScriptsMojo extends AbstractMojo {
 		try(OutputStream stream = new FileOutputStream(file)) {
 			out = new BufferedWriter(new OutputStreamWriter(stream, "UTF-8"));
 			out.write(content);
+			out.flush();
+			getLog().debug("new script downloaded at -> " + file.getAbsolutePath());
 		} catch (IOException e) {
 			getLog().error(e);
 			throw new MojoExecutionException("Error creating file " + file, e);
-		} finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					// ignore
-					getLog().error(e);
-				}
-			}
 		}
 	}
 }

@@ -8,6 +8,7 @@ How to use the Toast Tk Maven Plugin can be found on the [example project](https
 * __generates-sources:download__ to download scenarios related to the user token.
 * __install:upload__ to push the sentences you want to re-use on the webapp.
 * __verify:run__ to execute a set of scripts and displays the execution report.
+* __integration-test:report__ to execute a set of test plans and store related reports.
 
 ## Examples
 
@@ -78,6 +79,36 @@ How to use the Toast Tk Maven Plugin can be found on the [example project](https
 	</executions>
 </plugin>
 ```
+
+* Report Mojo - example
+```
+<plugin>
+	<groupId>io.toast-tk</groupId>
+	<artifactId>toast-tk-maven-plugin</artifactId>
+	<version>0.1.5-SNAPSHOT</version>
+	<executions>
+		<execution>
+			<phase>integration-test</phase>
+			<goals>
+				<goal>report</goal>
+			</goals>
+			<configuration>
+				<scripts>
+					<fileset>
+						<directory>${basedir}/src/main/resources</directory>
+						<includes>
+							<include>/**/*.*.md</include>
+						</includes>
+					</fileset>
+				</scripts>
+				<pluginsDirectory>${basedir}/plugins</pluginsDirectory>
+				<outputDirectory>${basedir}/reports</outputDirectory>
+			</configuration>
+		</execution>
+	</executions>
+</plugin>
+```
+
 # Contribution
 
 Toast TK is a young ![Open Source Love](https://badges.frapsoft.com/os/v3/open-source.svg?v=103) project.  
