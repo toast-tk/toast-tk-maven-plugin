@@ -13,7 +13,7 @@ How to use the Toast Tk Maven Plugin can be found on the [example project](https
 ## Examples
 
 * Include maven snapshot repository
-```
+```xml
 <repository>
 	<id>snapshots-repo</id>
 	<url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -28,7 +28,7 @@ How to use the Toast Tk Maven Plugin can be found on the [example project](https
 
 * Download Mojo - example
 
-```
+```xml
 <plugin>
 	<groupId>io.toast-tk</groupId>
 	<artifactId>toast-tk-maven-plugin</artifactId>
@@ -52,7 +52,7 @@ How to use the Toast Tk Maven Plugin can be found on the [example project](https
 
 
 * Run Mojo - example
-```
+```xml
 <plugin>
 	<groupId>io.toast-tk</groupId>
 	<artifactId>toast-tk-maven-plugin</artifactId>
