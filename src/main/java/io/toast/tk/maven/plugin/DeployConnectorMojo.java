@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import io.toast.tk.core.rest.HttpRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -19,7 +20,6 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 import com.google.gson.Gson;
-
 import io.toast.tk.core.annotation.Action;
 import io.toast.tk.core.annotation.ActionAdapter;
 import io.toast.tk.core.rest.RestUtils;
@@ -33,7 +33,11 @@ import javassist.Modifier;
 import javassist.NotFoundException;
 import javassist.bytecode.ClassFile;
 
-@Mojo(name = "upload", defaultPhase = LifecyclePhase.INSTALL, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(name = "upload", 
+defaultPhase = LifecyclePhase.INSTALL, 
+requiresDependencyResolution = ResolutionScope.COMPILE,
+requiresOnline = true,
+threadSafe = true)
 public class DeployConnectorMojo extends AbstractMojo {
 
     @Parameter(required = true, alias = "webAppUrl", defaultValue = "9000")
@@ -45,6 +49,7 @@ public class DeployConnectorMojo extends AbstractMojo {
     @Parameter(required = true, defaultValue = "${project}", readonly = true)
     MavenProject project;
 
+    @Override
     public void execute()
             throws MojoExecutionException {
         getLog().info("Toast Tk Maven Plugin - Files will be posted to: " + host);
@@ -61,7 +66,7 @@ public class DeployConnectorMojo extends AbstractMojo {
         ClassPool cp = initClassPath();
         File file = new File(project.getBuild().getOutputDirectory());
         Iterator<File> iterateFiles = FileUtils.iterateFiles(file, new String[]{"class"}, true);
-        for (; iterateFiles.hasNext(); ) {
+        while (iterateFiles.hasNext()) {
             try {
                 processClassAndPostConnector(cp, iterateFiles.next());
             } catch (Exception e) {
@@ -114,10 +119,13 @@ public class DeployConnectorMojo extends AbstractMojo {
 
     private void postConnector(final List<ActionAdapterDescriptorLine> sentences) {
         Gson gson = new Gson();
-        ActionAdapterDescriptor descriptor = new ActionAdapterDescriptor(project.getName(),
-                sentences);
+        ActionAdapterDescriptor descriptor = new ActionAdapterDescriptor(project.getName(), sentences);
+        String postUri = host + "/api/actionadapter";
         String json = gson.toJson(descriptor);
-        RestUtils.post(host + "/actionadapter", json, apiKey);
+        HttpRequest request = HttpRequest.Builder.create()
+                                            .uri(postUri).json(json)
+                                            .withKey(apiKey).build();
+        RestUtils.post(request);
     }
 
 }

@@ -4,27 +4,36 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>io.toast-tk</groupId>
-	<version>0.1.4-SNAPSHOT</version>
+	<version>0.1.5-SNAPSHOT</version>
 	<artifactId>toast-tk-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<name>Toast Toolkit - Maven Mojo Plugin</name>
-	<url>http://maven.apache.org</url>
-	
+	<name>Toast Toolkit - Maven Plugin</name>
+	<url>http://toast-tk.io</url>
+	<description>
+		Toast TK Maven plugin Mojos:
+		- download: Download test scripts locally
+		- upload: Upload local @Action sentences to be used on the webapp (steps' auto-completion)
+		- run: Execute local test scripts
+		- report: publish test plan reports
+	</description>
 	<properties>
 		<javassit.version>3.18.1-GA</javassit.version>
-		<reflexion.version>0.9.9-RC1</reflexion.version>
+		<reflexion.version>0.9.10</reflexion.version>
 		<maven-plugin-api.version>3.3.9</maven-plugin-api.version>
 		<maven-project.version>2.2.1</maven-project.version>
 		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
 		<maven-plugin-plugin.version>3.4</maven-plugin-plugin.version>
 		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
 		<maven-plugin-annotations.version>3.4</maven-plugin-annotations.version>
-		<toast-tk.engine.version>0.1.4-SNAPSHOT</toast-tk.engine.version>
 		<maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
 		<maven-javadoc-plugin.version>2.3</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>2.0.4</maven-source-plugin.version>
 		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
 		<maven-release-plugin.version>2.4</maven-release-plugin.version>
+		<maven-artifact.version>2.2.1</maven-artifact.version>
+		<file-management.version>3.0.0</file-management.version>
+		<java.version>1.8</java.version>
+		<java.charset.encoding>UTF-8</java.charset.encoding>
 	</properties>
 
 	<build>
@@ -34,9 +43,9 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<encoding>UTF-8</encoding>
-					<source>1.8</source>
-					<target>1.8</target>
+					<encoding>${java.charset.encoding}</encoding>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 					<fork>true</fork>
 					<verbose>true</verbose>
 				</configuration>
@@ -117,6 +126,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-artifact</artifactId>
+			<version>${maven-artifact.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-project</artifactId>
 			<version>${maven-project.version}</version>
 		</dependency>
@@ -136,17 +150,28 @@
 			<artifactId>javassist</artifactId>
 			<version>${javassit.version}</version>
 		</dependency>
+
 				
 		<!-- Toast Dependencies -->
 		<dependency>
 			<groupId>io.toast-tk</groupId>
-			<artifactId>toast-tk-adapters-api</artifactId>
-			<version>${toast-tk.engine.version}</version>
+			<artifactId>toast-tk-runtime</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.toast-tk</groupId>
 			<artifactId>toast-tk-rest-utils</artifactId>
-			<version>${toast-tk.engine.version}</version>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.toast-tk</groupId>
+			<artifactId>toast-tk-agent-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.toast-tk</groupId>
+			<artifactId>toast-tk-plugin-loader</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<profiles>
