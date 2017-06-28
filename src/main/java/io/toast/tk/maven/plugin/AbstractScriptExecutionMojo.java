@@ -19,7 +19,6 @@ import com.google.inject.Module;
 
 import io.toast.tk.adapter.cache.ToastCache;
 import io.toast.tk.plugin.IAgentPlugin;
-import io.toast.tk.plugin.PluginLoader;
 
 public abstract class AbstractScriptExecutionMojo<E> extends AbstractMojo {
 

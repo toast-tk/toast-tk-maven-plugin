@@ -168,11 +168,6 @@
 			<artifactId>toast-tk-agent-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>io.toast-tk</groupId>
-			<artifactId>toast-tk-plugin-loader</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 	<profiles>
 		<profile>
